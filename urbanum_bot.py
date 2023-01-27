@@ -10,18 +10,25 @@ API_KEY = os.getenv('API_KEY')
 bot = telebot.TeleBot(API_KEY)
 
 previous_state = ' '
+message_id = ' '
 
-@bot.message_handler()
+#@bot.message_handler()
+@bot.channel_post_handler()
 def check_state(sc):
     global previous_state
-    with open('/var/www/html/state.json') as json_file:
+    global message_id
+    with open('/home/urbanum/state.json') as json_file:
         current_state = json.load(json_file)
         if current_state != previous_state:
             previous_state = current_state
+            try:
+                bot.delete_message(-1001857650406, message_id)
+            except:
+                pass
             if current_state['state'] == 'on':
-                bot.send_message(-764942799, 'Urbanum is open!')
+                message_id = bot.send_message(-1001857650406, 'Urbanum is open!').message_id
             else:
-                bot.send_message(-764942799, 'Urbanum is closed :(')
+                message_id = bot.send_message(-1001857650406, 'Urbanum is closed :(').message_id
     s.enter(5, 1, check_state, (sc,))
 
 #@bot.message_handler(commands=['Urbanum'])
